@@ -1,0 +1,127 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role
+
+  adminId   String?
+
+
+  trainerWorkouts WorkoutPlan[] @relation("TrainerWorkouts")
+  memberWorkouts  WorkoutPlan[] @relation("MemberWorkouts")
+
+
+  memberSessions  SessionBooking[] @relation("MemberSessions")
+  trainerSessions SessionBooking[] @relation("TrainerSessions")
+
+
+  subscriptions Subscription[]
+  attendances   Attendance[]
+  progressLogs  Progress[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  TRAINER
+  MEMBER
+}
+
+model SubscriptionPlan {
+  id            String @id @default(cuid())
+  name          String
+  price         Float
+  durationDays  Int
+
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id        String @id @default(cuid())
+
+  userId    String
+  planId    String
+
+  startDate DateTime @default(now())
+  endDate   DateTime
+  status    SubscriptionStatus
+
+  user      User @relation(fields: [userId], references: [id])
+  plan      SubscriptionPlan @relation(fields: [planId], references: [id])
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
+model WorkoutPlan {
+  id          String @id @default(cuid())
+  title       String
+  description String?
+
+  trainerId   String
+  memberId    String?
+
+  trainer     User  @relation("TrainerWorkouts", fields: [trainerId], references: [id])
+  member      User? @relation("MemberWorkouts", fields: [memberId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model Attendance {
+  id        String @id @default(cuid())
+
+  userId    String
+  user      User @relation(fields: [userId], references: [id])
+
+  date      DateTime @default(now())
+}
+
+model Progress {
+  id        String @id @default(cuid())
+
+  userId    String
+  user      User @relation(fields: [userId], references: [id])
+
+  weight    Float
+  reps      Int?
+  notes     String?
+
+  createdAt DateTime @default(now())
+}
+
+model SessionBooking {
+  id        String @id @default(cuid())
+
+  memberId  String
+  trainerId String
+
+  member    User @relation("MemberSessions", fields: [memberId], references: [id])
+  trainer   User @relation("TrainerSessions", fields: [trainerId], references: [id])
+
+  date      DateTime
+  status    SessionStatus
+
+  createdAt DateTime @default(now())
+}
+
+enum SessionStatus {
+  BOOKED
+  COMPLETED
+  CANCELLED
+}
