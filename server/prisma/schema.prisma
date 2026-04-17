@@ -14,17 +14,23 @@ model User {
   password  String
   role      Role
 
+  // 🔗 Admin hierarchy
   adminId   String?
+  admin     User?   @relation("AdminToUsers", fields: [adminId], references: [id])
+  users     User[]  @relation("AdminToUsers")
 
-
+  // 🔗 Workout
   trainerWorkouts WorkoutPlan[] @relation("TrainerWorkouts")
-  memberWorkouts  WorkoutPlan[] @relation("MemberWorkouts")
+  assignments     WorkoutAssignment[]
 
-
+  // 🔗 Sessions
   memberSessions  SessionBooking[] @relation("MemberSessions")
   trainerSessions SessionBooking[] @relation("TrainerSessions")
 
+  // 🔗 Trainer availability
+  availabilities  TrainerAvailability[]
 
+  // 🔗 Business
   subscriptions Subscription[]
   attendances   Attendance[]
   progressLogs  Progress[]
@@ -57,10 +63,12 @@ model Subscription {
 
   startDate DateTime @default(now())
   endDate   DateTime
-  status    SubscriptionStatus
+  status    SubscriptionStatus @default(ACTIVE)
 
   user      User @relation(fields: [userId], references: [id])
   plan      SubscriptionPlan @relation(fields: [planId], references: [id])
+
+  @@index([userId])
 }
 
 enum SubscriptionStatus {
@@ -75,12 +83,25 @@ model WorkoutPlan {
   description String?
 
   trainerId   String
-  memberId    String?
+  trainer     User @relation("TrainerWorkouts", fields: [trainerId], references: [id])
 
-  trainer     User  @relation("TrainerWorkouts", fields: [trainerId], references: [id])
-  member      User? @relation("MemberWorkouts", fields: [memberId], references: [id])
+  assignments WorkoutAssignment[]
 
   createdAt DateTime @default(now())
+}
+
+model WorkoutAssignment {
+  id        String @id @default(cuid())
+
+  planId    String
+  memberId  String
+
+  plan      WorkoutPlan @relation(fields: [planId], references: [id])
+  member    User @relation(fields: [memberId], references: [id])
+
+  assignedAt DateTime @default(now())
+
+  @@index([memberId])
 }
 
 model Attendance {
@@ -90,6 +111,8 @@ model Attendance {
   user      User @relation(fields: [userId], references: [id])
 
   date      DateTime @default(now())
+
+  @@index([userId])
 }
 
 model Progress {
@@ -98,11 +121,14 @@ model Progress {
   userId    String
   user      User @relation(fields: [userId], references: [id])
 
+  exercise  String
   weight    Float
-  reps      Int?
+  reps      Int
   notes     String?
 
   createdAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 model SessionBooking {
@@ -118,6 +144,17 @@ model SessionBooking {
   status    SessionStatus
 
   createdAt DateTime @default(now())
+}
+
+model TrainerAvailability {
+  id        String @id @default(cuid())
+
+  trainerId String
+  trainer   User @relation(fields: [trainerId], references: [id])
+
+  date      DateTime
+
+  @@index([trainerId])
 }
 
 enum SessionStatus {
