@@ -2,6 +2,7 @@ import prisma from '../lib/prisma'
 import {Request,Response} from 'express'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
+
 export const login=async(req:Request,res:Response)=>
 {
     try{
