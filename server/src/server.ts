@@ -1,8 +1,9 @@
 import express from 'express'
-import authRoute from './routes/authRoute'
+import authRoute from './modules/auth/authRoute'
 import cors from 'cors'
 import dotenv from 'dotenv'
-import createadmin from './routes/createAdminRoute'
+import createadmin from './modules/superAdmin/SuperAdminRoute'
+import adminRoutes from './modules/admin/adminRoute'
 dotenv.config()
 const app=express()
 
@@ -20,7 +21,9 @@ app.get('/', (req, res) => {
 
 //api for the login
 app.use('/auth',authRoute)
-app.use('/admin',createadmin)
+app.use('/superAdmin',createadmin)
+app.use('/admin',adminRoutes)
+
 
 
 app.listen(5000, () => {
