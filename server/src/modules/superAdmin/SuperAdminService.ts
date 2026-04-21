@@ -23,3 +23,26 @@ export const createAdminService=async(name:string,email:string,password:string)=
         })
         return Admin
 }
+
+export const deleteAdminService=async(adminId:string,superAdmin:string)=>
+{
+    //check if the id having admin exist or not 
+    const checkAdmin=await prisma.user.findUnique({
+        where:{
+            id:adminId
+        }
+    })
+    if(!checkAdmin)
+    {
+        throw new Error("Admin doesnt exist ")
+    }
+    await prisma.user.deleteMany({
+       where: { adminId: adminId }
+    })
+    const deleteAdmin=await prisma.user.delete({
+        where:{
+            id:adminId
+        }
+    })
+    return deleteAdmin
+}

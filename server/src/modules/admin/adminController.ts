@@ -1,9 +1,13 @@
 import { Request, Response } from "express-serve-static-core";
-import { createTrainerService,createMemberService } from "../admin/adminService";
+import { createTrainerService,userByIdService,createMemberService,allUsersService,deletedUserService, } from "../admin/adminService";
+
+
+//to create trainer 
 export const createTrainer = async (req: Request, res: Response) => {
   //try catch block
   try {
     //data from the body
+
     const { name, email, password } = req.body;
     const adminId = req?.user?.id;
     if (!adminId) {
@@ -15,6 +19,7 @@ export const createTrainer = async (req: Request, res: Response) => {
     }
     
     //check if the email alrady exist or not
+        console.log("adminId being passed:", adminId)
     const trainer =await createTrainerService(name, email, password, adminId);
     return res.status(200).json({ message: "Trainer created sucessfully",trainer });
   } catch (err:any) {
@@ -23,8 +28,7 @@ export const createTrainer = async (req: Request, res: Response) => {
 };
 
 
-
-
+//to create member 
 export const createMember=async(req:Request,res:Response)=>
 {
   try{
@@ -42,6 +46,73 @@ export const createMember=async(req:Request,res:Response)=>
     
     const member=await createMemberService(name,email,password,adminId)
     return res.status(200).json({message:"Member created sucessfully",member})
+  }
+  catch(err:any)
+  {
+    return res.status(500).json({message:err.message})
+  }
+}
+//get all the trainer 
+export const getAllUsers=async(req:Request,res:Response)=>
+{
+  //try catch 
+  try{
+    const role=req.query.role as string
+   
+    if(!role)
+    {
+      return res.status(400).json("only admin can get ")
+    }
+    const allUsers=await allUsersService(role)
+    return res.status(200).json(allUsers)
+  }
+  catch(err:any)
+  {
+    return res.status(500).json({message:err.message})
+  }
+
+}
+
+export const getUserById=async(req:Request,res:Response)=>
+{
+  try{
+    const userId=req.params.id as string
+    const adminId=req.user?.id as string
+    if(!userId)
+    {
+      return res.status(400).json({message:"couldnot get the userid from req"})
+    }
+    if(!adminId)
+    {
+      return res.status(401).json("Only admin can create member ")
+    }
+    const userById=await userByIdService(userId,adminId)
+    return res.status(200).json(userById)
+  }
+  catch(err:any)
+  {
+    return res.status(500).json({message:err.message})
+  }
+}
+
+//delete user  by id
+export const deleteUserById=async(req:Request,res:Response)=>
+{
+  try{
+    //need the id of the deleting data
+    const userId=req.params.id as string
+    const adminId=req.user?.id
+    if(!userId)
+    {
+      return res.status(400).json({message:"Doesnt have to id "})
+    }
+    if(!adminId)
+    {
+      return res.status(400).json({message:"only admin can delete "})
+    }
+    const deleteUser=await deletedUserService(adminId,userId)
+    return res.status(200).json({message:"Successfully deleted the trainer"})
+
   }
   catch(err:any)
   {
