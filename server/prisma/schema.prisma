@@ -13,6 +13,7 @@ model User {
   email     String   @unique
   password  String
   role      Role
+  subscriptionPlans SubscriptionPlan[]
 
   // 🔗 Admin hierarchy
   adminId   String?
@@ -51,7 +52,8 @@ model SubscriptionPlan {
   name          String
   price         Float
   durationDays  Int
-
+  adminId      String
+  admin        User @relation(fields: [adminId], references: [id])
   subscriptions Subscription[]
 }
 

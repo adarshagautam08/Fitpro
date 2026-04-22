@@ -1,5 +1,5 @@
 import { Request, Response } from "express-serve-static-core";
-import { createTrainerService,userByIdService,createMemberService,allUsersService,deletedUserService, } from "../admin/adminService";
+import { createTrainerService,userByIdService,createMemberService,allUsersService,deletedUserService,createPlanService,getPlanService,assignPlanService } from "../admin/adminService";
 
 
 //to create trainer 
@@ -112,6 +112,69 @@ export const deleteUserById=async(req:Request,res:Response)=>
     }
     const deleteUser=await deletedUserService(adminId,userId)
     return res.status(200).json({message:"Successfully deleted the trainer"})
+
+  }
+  catch(err:any)
+  {
+    return res.status(500).json({message:err.message})
+  }
+}
+
+//create subscription plan
+export const createSubPlan=async(req:Request,res:Response)=>
+{
+  try{
+     const {name,price,durationDays}=req.body
+     const parsedDays=parseInt(durationDays)
+     const parsedPrice=parseFloat(price)
+     const adminId=req.user?.id
+     //check validation
+     if(!name||!price||!durationDays)
+     {
+      return res.status(400).json({message:"The fields are empty "})
+     }
+     if(!adminId)
+     {
+      return res.status(401).json({message:"No adminId"})
+     }
+     const createPlan=await createPlanService(name,parsedPrice,parsedDays,adminId)
+     return res.status(201).json({message:"SubscriptionPlan created Sucessfully",createPlan},)
+  }
+  catch(err:any)
+  {
+    return res.status(500).json({message:err.message})
+  }
+}
+//for getting the plans 
+export const getAllPlan=async(req:Request,res:Response)=>
+{
+  try{
+    const adminId=req.user?.id as string
+    if(!adminId)
+    {
+      return res.status(400).json({message:"no adminid"})
+    }
+    const getPlans=await getPlanService(adminId)
+    return res.status(200).json(getPlans)
+  }
+  catch(err:any)
+  {
+    return res.status(500).json({meaasge:err.message})
+  }
+}
+
+//for assigning plan to the user
+export const assignPlan=async(req:Request,res:Response)=>
+{
+  try{
+    const {memberId,planId}=req.body 
+    if(!memberId||!planId)
+    {
+      return res.status(400).json({message:"Request didnt have id  "})
+    }
+    const subscription=await assignPlanService(memberId,planId)
+    
+    return res.status(200).json({message:"Sucessfully assign the plan",subscription})
 
   }
   catch(err:any)
