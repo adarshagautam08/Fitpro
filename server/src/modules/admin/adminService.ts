@@ -196,3 +196,23 @@ export const assignPlanService = async (memberId: string, planId: string) => {
   });
   return subscription;
 };
+
+//gettting the member status 
+export const getStatusService=async(memberId:string)=>
+{
+  const getStatus=await prisma.subscription.findFirst({
+    where:{
+      userId:memberId
+    },
+    select:{
+      status:true,
+      endDate:true
+    }
+
+  })
+  if(!getStatus)
+  {
+    throw new Error("doesnt have the subscription ")
+  }
+  return getStatus
+}

@@ -1,7 +1,7 @@
 import {Router} from 'express'
 import { authMiddleware } from '../../middleware/authmiddleware'
 import { roleMiddleware } from '../../middleware/rolemiddleware'
-import {createTrainer,createMember,assignPlan,getAllUsers,deleteUserById,getUserById,createSubPlan,getAllPlan} from './adminController'
+import {createTrainer,createMember,assignPlan,getAllUsers,deleteUserById,getUserById,createSubPlan,getAllPlan,getSubStatus} from './adminController'
 
 const router=Router()
 //route for creating/getting/deleting trainer and member  by admin
@@ -15,5 +15,8 @@ router.post('/create-subscriptionPlan',authMiddleware,roleMiddleware(["ADMIN"]),
 router.get('/allPlans',authMiddleware,roleMiddleware(["ADMIN"]),getAllPlan)
 //assign the subscription to the member 
 router.post('/assignPlan',authMiddleware,roleMiddleware(["ADMIN"]),assignPlan)
+//getting the status of the member subscription 
+router.get('/getSubStatus',authMiddleware,roleMiddleware(["MEMBER"]),getSubStatus)
+
 
 export default router

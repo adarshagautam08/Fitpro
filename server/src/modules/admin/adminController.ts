@@ -1,5 +1,5 @@
 import { Request, Response } from "express-serve-static-core";
-import { createTrainerService,userByIdService,createMemberService,allUsersService,deletedUserService,createPlanService,getPlanService,assignPlanService } from "../admin/adminService";
+import { createTrainerService,userByIdService,createMemberService,allUsersService,deletedUserService,createPlanService,getPlanService,assignPlanService,getStatusService } from "../admin/adminService";
 
 
 //to create trainer 
@@ -180,5 +180,22 @@ export const assignPlan=async(req:Request,res:Response)=>
   catch(err:any)
   {
     return res.status(500).json({message:err.message})
+  }
+}
+//memmber getting the subscribtion status 
+export const getSubStatus=async(req:Request,res:Response)=>
+{
+  try{
+    const memberId=req.user?.id 
+
+    if(!memberId){
+      return res.status(401).json({message:"Doesnt have the memberId in the req"})
+    }
+    const getStatus=await getStatusService(memberId)
+    return res.status(200).json(getStatus)
+  }
+  catch(err:any)
+  {
+    return res.status(500).json({message:err.message,})
   }
 }
