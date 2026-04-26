@@ -4,7 +4,8 @@ import {
   createWorkoutService,
   getAllPlanService,
   assignWorkoutService,
-  addAvailabilityService
+  addAvailabilityService,
+  updateSessionService
 
 } from "./trainerService";
 //for creating the workout plan
@@ -80,6 +81,23 @@ export const addAvailability=async(req:Request,res:Response)=>
   catch(err:any)
   {
    return res.status(500).json({message:err.message}) 
+  }
+}
+//update the status
+export const updateStatus=async(req:Request,res:Response)=>{
+  try{
+    const status=req.body
+    const sessionId=req.params.id as string
+    if(!status)
+    {
+      return res.status(400).json({message:"the fields are empty "})
+    }
+    const updatedSession=updateSessionService(status,sessionId)
+    return res.status(201).json({message:"Updated sessionStatus ",updateSessionService})
+  }
+  catch(err:any)
+  {
+    return res.status(500).json({message:err.message})
   }
 }
 

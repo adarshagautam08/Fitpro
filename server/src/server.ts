@@ -27,6 +27,7 @@ app.use('/trainer',trainerRoute)
 app.use('/member',memberRoute)
 
 
+
 app.listen(5000, () => {
   console.log('Server running on port 5000')
 })

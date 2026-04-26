@@ -1,5 +1,6 @@
 import { TransformStreamDefaultController } from "stream/web";
 import prisma from "../../lib/prisma"
+import { SessionStatus } from '@prisma/client'
 import bcrypt from "bcrypt";
 //creating the workout 
 export const createWorkoutService=async(title:string,description:string,trainerId:string)=>
@@ -65,4 +66,15 @@ export const addAvailabilityService=async(trainerId:string,date:Date)=>
         }
     })
     return addedAvailability
+}
+
+//update the sessionStatus 
+export const updateSessionService = async ( status: string,sessionId: string) => {
+  const updated = await prisma.sessionBooking.update({
+    where: { id: sessionId },
+    data: { 
+        status:status as SessionStatus
+     }
+  })
+  return updated
 }

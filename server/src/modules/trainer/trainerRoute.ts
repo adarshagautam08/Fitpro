@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authMiddleware } from "../../middleware/authmiddleware";
 import { roleMiddleware } from "../../middleware/rolemiddleware";
-import {createWorkout,getAllPlan,assignWorkout,addAvailability} from "../trainer/trainerController"
+import {createWorkout,getAllPlan,assignWorkout,addAvailability,updateStatus} from "../trainer/trainerController"
 
 const router=Router();
 router.post('/create-workoutPlans',authMiddleware,roleMiddleware(["TRAINER"]),createWorkout)
@@ -11,4 +11,7 @@ router.get('/getWorkoutPlans',authMiddleware,roleMiddleware(["TRAINER"]),getAllP
 router.post('/assignWorkoutMember',authMiddleware,roleMiddleware(["TRAINER"]),assignWorkout)
 //trainer set avaibility 
 router.post('/availability',authMiddleware,roleMiddleware(["TRAINER"]),addAvailability)
+//trainer update the SessionStatus
+router.patch('/updateStatus/:id',authMiddleware,roleMiddleware(["TRAINER"]),updateStatus)
+
 export default router
