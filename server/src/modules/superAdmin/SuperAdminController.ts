@@ -1,20 +1,27 @@
-import {Request,Response} from 'express'
+import {NextFunction, Request,Response} from 'express'
 import {createAdminService,deleteAdminService} from '../superAdmin/SuperAdminService'
+import { createAdminSchema } from './superAdminSchema'
 //creating the admin 
-export const createAdmin = async (req: Request, res: Response) => {
+export const createAdmin = async (req: Request, res: Response ,next:NextFunction) => {
   try {
-    const { name, email, password } = req.body
+    const result=createAdminSchema.safeParse(req.body)
+    if(!result.success)
+    {
+      return res.status(400).json({error:result.error.issues })
+    }
+
+    const { name, email, password } = result.data;
     if (!name || !email || !password) return res.status(400).json({ message: 'Fields are empty' })
 
     const admin = await createAdminService(name, email, password)
     return res.status(201).json({ message: 'Admin created successfully', user: { id: admin.id, name: admin.name, email: admin.email, role: admin.role } })
   } catch (err: any) {
-    return res.status(400).json({ message: err.message })
+    next(err)
   }
 }
 
 //for deleting the admin
-export const deleteAdmin=async(req:Request,res:Response)=>
+export const deleteAdmin=async(req:Request,res:Response,next:NextFunction)=>
 {
   try{
     const adminId=req.params.id as string
@@ -32,6 +39,6 @@ export const deleteAdmin=async(req:Request,res:Response)=>
   }
   catch(err:any)
   {
-   return res.status(500).json({message:err.message}) 
+   next(err)
   }
 }

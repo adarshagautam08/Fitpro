@@ -1,6 +1,6 @@
-import { Request,Response } from "express-serve-static-core"
+import { NextFunction, Request,Response } from "express-serve-static-core"
 import{viewAllPlansService,getTrainerAvailabilityService,sessionBookService,addAttendenceService,getAllSessionService,getAttendenceService} from './memberService'
-export const viewAllPlans=async(req:Request,res:Response)=>
+export const viewAllPlans=async(req:Request,res:Response,next:NextFunction)=>
 {
     try{
         const memberId=req.user?.id
@@ -13,11 +13,11 @@ export const viewAllPlans=async(req:Request,res:Response)=>
     }   
     catch(err:any)
     {
-        return res.status(500).json({message:err.message})
+        next(err)
     } 
 }
 //get trainer who are availabible 
-export const getTrainerAvailability=async(req:Request,res:Response)=>
+export const getTrainerAvailability=async(req:Request,res:Response,next:NextFunction)=>
 {
     try{
         
@@ -32,11 +32,11 @@ export const getTrainerAvailability=async(req:Request,res:Response)=>
     }
     catch(err:any)
     {
-        return res.status(500).json({message:err.message})
+        next(err)
     }
 }
 //book the session 
-export const sessionBook=async(req:Request,res:Response)=>{
+export const sessionBook=async(req:Request,res:Response,next:NextFunction)=>{
     try{
         const {trainerId,date}=req.body
         const memberId=req.user?.id as string
@@ -52,11 +52,11 @@ export const sessionBook=async(req:Request,res:Response)=>{
     }
     catch(err:any)
     {
-        return res.status(500).json({message:err.message})
+      next(err)
     }
 }
 //get all the sessionBooked
-export const getAllSession=async(req:Request,res:Response)=>
+export const getAllSession=async(req:Request,res:Response,next:NextFunction)=>
 {
     try{
         const memberId=req.user?.id
@@ -69,11 +69,11 @@ export const getAllSession=async(req:Request,res:Response)=>
     }
     catch(err:any)
     {
-        return res.status(500).json({message:err.message})
+        next(err)
     }
 }
 //add attendence 
-export const addAttendence =async(req:Request,res:Response)=>{
+export const addAttendence =async(req:Request,res:Response,next:NextFunction)=>{
     try{
         const memberId=req.user?.id
         if(!memberId)
@@ -85,11 +85,11 @@ export const addAttendence =async(req:Request,res:Response)=>{
     }
     catch(err:any)
     {
-        return res.status(500).json({message:err.message})
+        next(err)
     }
 }
 //get the attendence
-export const getAttendence=async(req:Request,res:Response)=>
+export const getAttendence=async(req:Request,res:Response,next:NextFunction)=>
 {
     try{
         const memberId=req.user?.id as string
@@ -102,6 +102,6 @@ export const getAttendence=async(req:Request,res:Response)=>
     }
     catch(err:any)
     {
-        return res.status(500).json({message:err.message})
+        next(err)
     }
 }

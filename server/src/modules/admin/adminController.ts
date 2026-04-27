@@ -1,14 +1,18 @@
-import { Request, Response } from "express-serve-static-core";
+import { NextFunction, Request, Response } from "express-serve-static-core";
 import { createTrainerService,userByIdService,createMemberService,allUsersService,deletedUserService,createPlanService,getPlanService,assignPlanService,getStatusService } from "../admin/adminService";
-
+import { createTrainerSchema,createPlanSchema } from "./adminSchema";
 
 //to create trainer 
-export const createTrainer = async (req: Request, res: Response) => {
+export const createTrainer = async (req: Request, res: Response,next:NextFunction) => {
   //try catch block
   try {
     //data from the body
-
-    const { name, email, password } = req.body;
+    const result=createTrainerSchema.safeParse(req.body)
+    if(!result.success)
+    {
+       return res.status(400).json({error:result.error.issues })
+    }
+    const { name, email, password } = result.data;
     const adminId = req?.user?.id;
     if (!adminId) {
       return res.status(401).json({ message: "only admin can create trainer  " });
@@ -23,16 +27,21 @@ export const createTrainer = async (req: Request, res: Response) => {
     const trainer =await createTrainerService(name, email, password, adminId);
     return res.status(200).json({ message: "Trainer created sucessfully",trainer });
   } catch (err:any) {
-    return res.status(500).json({message:err.message})
+    next(err)
   }
 };
 
 
 //to create member 
-export const createMember=async(req:Request,res:Response)=>
+export const createMember=async(req:Request,res:Response,next:NextFunction)=>
 {
   try{
-    const {name,email,password}=req.body
+     const result=createTrainerSchema.safeParse(req.body)
+    if(!result.success)
+    {
+       return res.status(400).json({error:result.error.issues })
+    }
+    const {name,email,password}=result.data
     const adminId=req.user?.id
 
     if(!adminId)
@@ -49,11 +58,11 @@ export const createMember=async(req:Request,res:Response)=>
   }
   catch(err:any)
   {
-    return res.status(500).json({message:err.message})
+    next(err)
   }
 }
 //get all the trainer 
-export const getAllUsers=async(req:Request,res:Response)=>
+export const getAllUsers=async(req:Request,res:Response,next:NextFunction)=>
 {
   //try catch 
   try{
@@ -68,12 +77,12 @@ export const getAllUsers=async(req:Request,res:Response)=>
   }
   catch(err:any)
   {
-    return res.status(500).json({message:err.message})
+    next(err)
   }
 
 }
 
-export const getUserById=async(req:Request,res:Response)=>
+export const getUserById=async(req:Request,res:Response,next:NextFunction)=>
 {
   try{
     const userId=req.params.id as string
@@ -91,12 +100,12 @@ export const getUserById=async(req:Request,res:Response)=>
   }
   catch(err:any)
   {
-    return res.status(500).json({message:err.message})
+    next(err)
   }
 }
 
 //delete user  by id
-export const deleteUserById=async(req:Request,res:Response)=>
+export const deleteUserById=async(req:Request,res:Response,next:NextFunction)=>
 {
   try{
     //need the id of the deleting data
@@ -116,37 +125,40 @@ export const deleteUserById=async(req:Request,res:Response)=>
   }
   catch(err:any)
   {
-    return res.status(500).json({message:err.message})
+    next(err)
   }
 }
 
 //create subscription plan
-export const createSubPlan=async(req:Request,res:Response)=>
-{
-  try{
-     const {name,price,durationDays}=req.body
-     const parsedDays=parseInt(durationDays)
-     const parsedPrice=parseFloat(price)
-     const adminId=req.user?.id
-     //check validation
-     if(!name||!price||!durationDays)
-     {
-      return res.status(400).json({message:"The fields are empty "})
-     }
-     if(!adminId)
+  export const createSubPlan=async(req:Request,res:Response,next:NextFunction)=>
+  {
+    try{
+      const result=createPlanSchema.safeParse(req.body)
+    if(!result.success)
+    {
+       return res.status(400).json({error:result.error.issues })
+    }
+      const {name,price,durationDays}=result.data
+      const adminId=req.user?.id
+      //check validation
+      if(!name||!price||!durationDays)
+      {
+        return res.status(400).json({message:"The fields are empty "})
+      }
+      if(!adminId)
      {
       return res.status(401).json({message:"No adminId"})
      }
-     const createPlan=await createPlanService(name,parsedPrice,parsedDays,adminId)
+     const createPlan=await createPlanService(name,price,durationDays,adminId)
      return res.status(201).json({message:"SubscriptionPlan created Sucessfully",createPlan},)
   }
   catch(err:any)
   {
-    return res.status(500).json({message:err.message})
+    next(err)
   }
 }
 //for getting the plans 
-export const getAllPlan=async(req:Request,res:Response)=>
+export const getAllPlan=async(req:Request,res:Response,next:NextFunction)=>
 {
   try{
     const adminId=req.user?.id as string
@@ -159,12 +171,12 @@ export const getAllPlan=async(req:Request,res:Response)=>
   }
   catch(err:any)
   {
-    return res.status(500).json({meaasge:err.message})
+    next(err)
   }
 }
 
 //for assigning plan to the user
-export const assignPlan=async(req:Request,res:Response)=>
+export const assignPlan=async(req:Request,res:Response,next:NextFunction)=>
 {
   try{
     const {memberId,planId}=req.body 
@@ -179,11 +191,11 @@ export const assignPlan=async(req:Request,res:Response)=>
   }
   catch(err:any)
   {
-    return res.status(500).json({message:err.message})
+    next(err)
   }
 }
 //memmber getting the subscribtion status 
-export const getSubStatus=async(req:Request,res:Response)=>
+export const getSubStatus=async(req:Request,res:Response,next:NextFunction)=>
 {
   try{
     const memberId=req.user?.id 
@@ -196,6 +208,6 @@ export const getSubStatus=async(req:Request,res:Response)=>
   }
   catch(err:any)
   {
-    return res.status(500).json({message:err.message,})
+    next(err)
   }
 }

@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 
 import {
   createWorkoutService,
@@ -9,7 +9,7 @@ import {
 
 } from "./trainerService";
 //for creating the workout plan
-export const createWorkout = async (req: Request, res: Response) => {
+export const createWorkout = async (req: Request, res: Response,next:NextFunction) => {
   try {
     const { title, description } = req.body;
     const trainerId = req.user?.id;
@@ -28,11 +28,11 @@ export const createWorkout = async (req: Request, res: Response) => {
       .status(200)
       .json({ message: "Created the workout plan", createdWorkout });
   } catch (err: any) {
-    return res.status(200).json({ message: err.message });
+    next()
   }
 };
 //get all the workout plans
-export const getAllPlan = async (req: Request, res: Response) => {
+export const getAllPlan = async (req: Request, res: Response,next:NextFunction) => {
   try {
     const trainerId = req.user?.id;
     if (!trainerId) {
@@ -43,11 +43,11 @@ export const getAllPlan = async (req: Request, res: Response) => {
     const getAllPlan = await getAllPlanService(trainerId);
     return res.status(200).json(getAllPlan);
   } catch (err: any) {
-    return res.status(500).json({ message: err.message });
+    next(err)
   }
 };
 //assigning the workout plan to member
-export const assignWorkout = async (req: Request, res: Response) => {
+export const assignWorkout = async (req: Request, res: Response,next:NextFunction) => {
   try {
     const trainerId=req.user?.id
 
@@ -62,11 +62,11 @@ export const assignWorkout = async (req: Request, res: Response) => {
     const assignedWorkout = await assignWorkoutService(memberId, planId,trainerId);
     return res.status(201).json({ message: "Assigned Workout", assignedWorkout });
   } catch (err: any) {
-    return res.status(500).json({ message: err.message });
+    next(err)
   }
 };
 //updating the Availability of trainer 
-export const addAvailability=async(req:Request,res:Response)=>
+export const addAvailability=async(req:Request,res:Response,next:NextFunction)=>
 {
   try{
     const trainerId=req.user?.id
@@ -80,11 +80,11 @@ export const addAvailability=async(req:Request,res:Response)=>
   }
   catch(err:any)
   {
-   return res.status(500).json({message:err.message}) 
+   next(err) 
   }
 }
 //update the status
-export const updateStatus=async(req:Request,res:Response)=>{
+export const updateStatus=async(req:Request,res:Response,next:NextFunction)=>{
   try{
     const status=req.body
     const sessionId=req.params.id as string
@@ -97,7 +97,7 @@ export const updateStatus=async(req:Request,res:Response)=>{
   }
   catch(err:any)
   {
-    return res.status(500).json({message:err.message})
+    next(err)
   }
 }
 

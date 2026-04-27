@@ -1,13 +1,18 @@
-import { Request, Response } from 'express'
+import { Request,NextFunction, Response } from 'express'
 import prisma from '../../lib/prisma'
 import bcrypt from 'bcrypt'
-import jwt from 'jsonwebtoken'
 import { loginService,refreshService } from './authService'
+import { loginSchema } from './authSchema'
 
-export const login = async (req: Request, res: Response) => {
+//controller for login 
+export const login = async (req: Request, res: Response,next: NextFunction) => {
   try {
-    const { email, password } = req.body
-    
+    const result =loginSchema.safeParse(req.body)
+    if(!result.success)
+    {
+      return res.status(400).json({error:result.error.issues })
+    }
+    const { email, password } =result.data    
     const user = await prisma.user.findUnique({ where: { email } })
     if (!user) return res.status(403).json({ message: 'Email does not exist' })
 
@@ -25,12 +30,12 @@ export const login = async (req: Request, res: Response) => {
 
     return res.status(200).json({ message: 'Login successful', accessToken })
   } catch (err) {
-    return res.status(500).json({ message: 'Internal server error' })
+    next(err)
   }
 }
 
 //controller for the refreshToken 
-export const refreshToken = (req: Request, res: Response) => {
+export const refreshToken = (req: Request, res: Response,next:NextFunction) => {
   try {
     const token = req.cookies.refreshToken;
 
@@ -47,6 +52,6 @@ export const refreshToken = (req: Request, res: Response) => {
 
     return res.status(200).json({ accessToken });
   } catch (err) {
-    return res.status(403).json({ message: "Invalid refresh token" });
+    next(err)
   }
 };
