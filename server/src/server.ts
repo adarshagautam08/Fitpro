@@ -8,10 +8,11 @@ import trainerRoute from './modules/trainer/trainerRoute'
 import memberRoute from './modules/member/memberRoute'
 import {errorHandler} from './middleware/errorHandler'
 import { globalLimiter } from './middleware/rateLimiter'
+import cookieParser from 'cookie-parser'
 dotenv.config()
 const app=express()
 
-
+app.use(cookieParser())
 app.use(express.json())
 app.use(cors({
   origin:process.env.CORS_ORIGIN,
