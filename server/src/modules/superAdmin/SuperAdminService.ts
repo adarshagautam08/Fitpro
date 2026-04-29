@@ -46,3 +46,19 @@ export const deleteAdminService=async(adminId:string,superAdmin:string)=>
     })
     return deleteAdmin
 }
+
+//get all the admins 
+export const getAdminsService=async()=>
+{
+    const getAdmins=await prisma.user.findMany({
+        where:{role:"ADMIN"},
+        select:{
+        id: true,
+      name: true,
+      email: true,
+      role: true,
+      createdAt: true
+        }
+     })
+     return getAdmins
+}

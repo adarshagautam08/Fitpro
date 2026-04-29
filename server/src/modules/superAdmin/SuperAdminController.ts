@@ -1,5 +1,5 @@
 import {NextFunction, Request,Response} from 'express'
-import {createAdminService,deleteAdminService} from '../superAdmin/SuperAdminService'
+import {createAdminService,deleteAdminService,getAdminsService} from '../superAdmin/SuperAdminService'
 import { createAdminSchema } from './superAdminSchema'
 //creating the admin 
 export const createAdmin = async (req: Request, res: Response ,next:NextFunction) => {
@@ -40,5 +40,23 @@ export const deleteAdmin=async(req:Request,res:Response,next:NextFunction)=>
   catch(err:any)
   {
    next(err)
+  }
+}
+//get all the admins 
+export const getAdmins=async(req:Request,res:Response,next:NextFunction)=>
+{
+  try{
+    const superAdmin=req.user?.id
+    if(!superAdmin)
+    {
+      return res.status(400).json({message:"Unauthorized"})
+    }
+    const getAllAdmins=await getAdminsService()
+    console.log(getAllAdmins)
+    return res.status(200).json(getAllAdmins)
+  }
+  catch(err:any)
+  {
+    next(err)
   }
 }
