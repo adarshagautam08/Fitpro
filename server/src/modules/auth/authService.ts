@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken'
+import prisma from '../../lib/prisma'
 
 export const loginService = (id: string, role: string) => {
   const accessToken = jwt.sign(
@@ -14,17 +15,21 @@ export const loginService = (id: string, role: string) => {
   return { accessToken, refreshToken }
 }
 
-export const refreshService=(token:string)=>
+export const refreshService=async(token:string)=>
 {
     const decoded = jwt.verify(
       token,
       process.env.JWT_REFRESH_TOKEN!
     ) as unknown as  { id: string; role: string };
 
+    const user = await prisma.user.findUnique({
+  where: { id: decoded.id },
+  select: { id: true, name: true, role: true, email: true }
+})
     const accessToken = jwt.sign(
       { id: decoded.id, role: decoded.role },
       process.env.JWT_ACCESS_TOKEN!,
       { expiresIn: "15m" }
     );
-    return {accessToken}   
+    return {accessToken,user}   
 }

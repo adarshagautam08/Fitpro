@@ -4,9 +4,9 @@ import Navbar from '@/components/navBar'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="h-screen bg-gray-50">
       <Navbar />
-      <main className="p-6">
+      <main className="p-6 h-[90%] bg-gray-100 ">
         {children}
       </main>
     </div>

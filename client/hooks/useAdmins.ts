@@ -8,12 +8,20 @@ export const useAdmins = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
 
+  const fetchAdmins = async () => {
+    try {
+      const data = await getAllAdmins()
+      setAdmins(data)
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   useEffect(() => {
-    getAllAdmins()
-      .then(data => setAdmins(data))
-      .catch(err => setError(err.message))
-      .finally(() => setLoading(false))
+    fetchAdmins()
   }, [])
 
-  return { admins, loading, error }
+  return { admins, loading, error, refetch: fetchAdmins }
 }

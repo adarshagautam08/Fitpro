@@ -15,7 +15,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [accessToken, setAccessToken] = useState("")
   const [isLoading, setIsLoading] = useState(true)
   useEffect(() => {
-    console.log(`${process.env.NEXT_PUBLIC_API_URL}/auth/refreshToken`)
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/refreshToken`, {
       method: "POST",
       credentials: "include"

@@ -14,6 +14,6 @@ export const createAdmins=async(data:{name:string,email:string,password:string})
 //delete admin by id
 export const deleteAdminByid=async(id:string)=>
 {
-    const res=await api.delete(`/superAdmin/deleteAdmin/:${id}`)
+    const res=await api.delete(`/superAdmin/deleteAdmin/${id}`)
     return res
 }

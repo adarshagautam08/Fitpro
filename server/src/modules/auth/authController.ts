@@ -39,7 +39,7 @@ export const login = async (req: Request, res: Response,next: NextFunction) => {
 }
 
 //controller for the refreshToken 
-export const refreshToken = (req: Request, res: Response,next:NextFunction) => {
+export const refreshToken =async (req: Request, res: Response,next:NextFunction) => {
   try {
     const token = req.cookies.refreshToken;
 
@@ -52,9 +52,9 @@ export const refreshToken = (req: Request, res: Response,next:NextFunction) => {
         .status(500)
         .json({ message: "JWT secrets not configured" });
     }
-    const {accessToken}=refreshService(token)
+    const {accessToken,user}=await refreshService(token)
 
-    return res.status(200).json({ accessToken });
+    return res.status(200).json({ accessToken,user });
   } catch (err) {
     next(err)
   }

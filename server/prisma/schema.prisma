@@ -52,23 +52,20 @@ model SubscriptionPlan {
   name          String
   price         Float
   durationDays  Int
-  adminId      String
-  admin        User @relation(fields: [adminId], references: [id])
+  adminId       String
+  admin         User @relation(fields: [adminId], references: [id], onDelete: Cascade)
   subscriptions Subscription[]
 }
 
 model Subscription {
   id        String @id @default(cuid())
-
   userId    String
   planId    String
-
   startDate DateTime @default(now())
   endDate   DateTime
   status    SubscriptionStatus @default(ACTIVE)
-
-  user      User @relation(fields: [userId], references: [id])
-  plan      SubscriptionPlan @relation(fields: [planId], references: [id])
+  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan      SubscriptionPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
@@ -83,51 +80,40 @@ model WorkoutPlan {
   id          String @id @default(cuid())
   title       String
   description String?
-
   trainerId   String
-  trainer     User @relation("TrainerWorkouts", fields: [trainerId], references: [id])
-
+  trainer     User @relation("TrainerWorkouts", fields: [trainerId], references: [id], onDelete: Cascade)
   assignments WorkoutAssignment[]
-
-  createdAt DateTime @default(now())
+  createdAt   DateTime @default(now())
 }
 
 model WorkoutAssignment {
-  id        String @id @default(cuid())
-
-  planId    String
-  memberId  String
-
-  plan      WorkoutPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
-  member    User @relation(fields: [memberId], references: [id])
-
+  id         String @id @default(cuid())
+  planId     String
+  memberId   String
+  plan       WorkoutPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  member     User @relation(fields: [memberId], references: [id], onDelete: Cascade)
   assignedAt DateTime @default(now())
 
   @@index([memberId])
 }
 
 model Attendance {
-  id        String @id @default(cuid())
-
-  userId    String
-  user      User @relation(fields: [userId], references: [id])
-
-  date      DateTime @default(now())
+  id     String @id @default(cuid())
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date   DateTime @default(now())
 
   @@index([userId])
 }
 
 model Progress {
   id        String @id @default(cuid())
-
   userId    String
-  user      User @relation(fields: [userId], references: [id])
-
+  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
   exercise  String
   weight    Float
   reps      Int
   notes     String?
-
   createdAt DateTime @default(now())
 
   @@index([userId])
@@ -135,25 +121,19 @@ model Progress {
 
 model SessionBooking {
   id        String @id @default(cuid())
-
   memberId  String
   trainerId String
-
-  member    User @relation("MemberSessions", fields: [memberId], references: [id])
-  trainer   User @relation("TrainerSessions", fields: [trainerId], references: [id])
-
+  member    User @relation("MemberSessions", fields: [memberId], references: [id], onDelete: Cascade)
+  trainer   User @relation("TrainerSessions", fields: [trainerId], references: [id], onDelete: Cascade)
   date      DateTime
   status    SessionStatus
-
   createdAt DateTime @default(now())
 }
 
 model TrainerAvailability {
   id        String @id @default(cuid())
-
   trainerId String
-  trainer   User @relation(fields: [trainerId], references: [id])
-
+  trainer   User @relation(fields: [trainerId], references: [id], onDelete: Cascade)
   date      DateTime
 
   @@index([trainerId])
